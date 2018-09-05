@@ -1,5 +1,44 @@
 `timescale 1ns / 1ps
 
+module ripple_carry(A, B, CI, S, CO);
+    input [3:0] A;   // Inputs
+    input [3:0] B;
+    input CI; // Carry in
+    output [3:0] S; // Sum bit
+    output CO;   // Carry bit
+    
+    wire C0, C1, C2; // Sum1, Carry1, Carry2
+    
+    full_adder Adder1(A[0], B[0], CI, S[0], C0);
+    full_adder Adder2(A[1], B[1], C0, S[1], C1);
+    full_adder Adder3(A[2], B[2], C1, S[2], C2);
+    full_adder Adder4(A[3], B[3], C2, S[3], CO);
+    
+endmodule
+
+module full_adder(A, B, CI, S, CO);
+    input A;   // Inputs
+    input B;
+    input CI; // Carry in
+    output S; // Sum bit
+    output CO;   // Carry bit
+    
+    wire S1, C1, C2; // Sum1, Carry1, Carry2
+    
+    half_adder Adder1(A, B, S1, C1);
+    half_adder Adder2(CI, S1, S, C2);
+    
+    or O1(CO, C2, C1);
+endmodule
+
+module half_adder(A, B, S, C);
+    input A, B;
+    output S, C;
+    
+    xor X1(S, A, B);
+    and A1(C, A, B);
+endmodule
+
 module Dflip(set, clk, Q, Qn);
     input set;   // Inputs
     input clk;
@@ -9,49 +48,6 @@ module Dflip(set, clk, Q, Qn);
     always @(posedge clk) begin // Update on clock
         Q = set;
         Qn = ~Q;
-    end
-endmodule
-/*
-module full_adder(A, B, Cin, sum, C);
-    input A;   // Inputs
-    input B;
-    input Cin; // Carry in
-    output reg sum; // Sum bit
-    output reg C;   // Carry bit
-    
-    wire [2:0] in; // Array to consolidate inputs for case statement
-    assign in = {A, B, Cin};
-    
-    always @(A, B) begin // Change whenever input changes
-        case(in) // Takes inputs and sets sum and carry based on values
-          3'b000: begin
-           sum = 0;
-           C = 0; end
-          3'b001: begin
-           sum = 1;
-           C = 0; end
-          3'b010: begin
-           sum = 1;
-           C = 0; end
-          3'b011: begin
-           sum = 0;
-           C = 1; end
-          3'b100: begin
-           sum = 1; 
-           C = 0; end
-          3'b101: begin
-           sum = 0;
-           C = 1; end
-          3'b110: begin
-           sum = 0;
-           C = 1; end
-          3'b111: begin
-           sum = 1;
-           C = 1; end
-          default: begin
-           sum = 0;
-           C = 0; end
-        endcase
     end
 endmodule
 
@@ -87,4 +83,3 @@ module mux8_1(in, select, out);
     
     assign out = D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7;
 endmodule
-*/

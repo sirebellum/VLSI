@@ -1,4 +1,36 @@
 `timescale 1ns / 1ps
+// ripple_adder test bench
+module test_bench_name();
+wire [3:0] sum;
+wire carry;
+reg [3:0] input1, input2;
+reg Carryin;
+ripple_carry instantiation_name(input1, input2, Carryin,
+sum, carry);
+initial
+begin
+#100 $finish; //total time to test
+end
+initial
+begin
+#10 //time to pass
+Carryin = 0;
+input1 = 4'b0000;
+input2 = 4'b0111;
+#10
+input2 = 4'b1111;
+#10
+Carryin = 1;
+input1 = 4'b1001;
+input2 = 4'b0010;
+#10
+input2 = 4'b0001;
+#10
+input1 = 4'b1111;
+input2 = 4'b1111;
+end
+endmodule
+/*
 // D flip flop test bench
 module test_bench();
 
@@ -20,7 +52,7 @@ initial begin // Initialize input and select line
     #10 in = 1;
 end
 endmodule
-
+*/
 /*
 // full adder test bench
 module test_bench();
