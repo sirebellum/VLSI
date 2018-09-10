@@ -5,21 +5,21 @@ module BCD_Binary3(St, A, B, CLK);
     input St, CLK;      // Start bit, Clock
     output reg [9:0] B; // Output binary value
 
-    reg [1:0] state; // Stores states, 00: initial, 01: shift, 10: correct
+    reg [1:0] state; // Stores states, 00: initial, 01: shift, 10: correct/subtract
     reg [3:0] counter; // Count number of shifts
     reg [11:0] Areg; // Register for storing and manipulating input A
     
     wire Sh; // 0 if counter reached 9
-    assign Sh = !( counter[3] & (counter[1]|counter[2]) ); // False when >= 1010 (9)
+    assign Sh = !( counter[3] & (counter[1]|counter[2]) ); // False when >= 1010 (10)
     
     wire Co; // 1 if any bcd is >= 1000
     assign Co = Areg[3] | Areg[7] | Areg[11];
     
-    // Internal clock gated by state so that only start can trigger initial execution
+    // Internal clock for start gating (unimplemented)
     wire clk_internal;
     assign clk_internal = CLK;
     
-    // Execute at start, and also on state change
+    // Execute at clock edge
     always @ (posedge clk_internal) begin
         case(state)
         
@@ -42,10 +42,10 @@ module BCD_Binary3(St, A, B, CLK);
                 Areg = Areg >> 1;
                 counter = counter + 1;
                 #5
-                // If counter <= 9
+                // If counter not > 9
                 if (Sh == 1)
                     state = 2'b01;
-                else
+                else // Done shifting if counter is 10 or greater
                     state = 2'b00;
                     
                 // If correction needed, change state
