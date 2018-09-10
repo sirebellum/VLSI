@@ -17,10 +17,10 @@ module BCD_Binary3(St, A, B, CLK);
     
     // Internal clock gated by state so that only start can trigger initial execution
     wire clk_internal;
-    assign clk_internal = (state[0]|state[1]) & CLK;
+    assign clk_internal = CLK;
     
     // Execute at start, and also on state change
-    always @ (posedge St, posedge clk_internal) begin
+    always @ (posedge clk_internal) begin
         case(state)
         
             // INITIAL STATE
