@@ -26,11 +26,10 @@ module BCD_Binary3(St, A, B, CLK);
             // INITIAL STATE
             2'b00: begin
                 counter = 0;
-                Areg = A;
-                #5
                 if (St == 1) begin // If start bit, set and change state
                     state = 2'b01;
-                    B = 0;
+                    Areg = A;
+                    #5 B = 0;
                 end
             end
             
@@ -56,12 +55,12 @@ module BCD_Binary3(St, A, B, CLK);
             // CORRECTION STATE
             2'b10: begin
                 // Subtract 0011 from first invalid bcd
+                if (Areg[11] == 1)
+                    Areg[11:8] = Areg[11:8] - 4'b0011;
+                if (Areg[7] == 1)
+                    Areg[7:4] = Areg[7:4] - 4'b0011;
                 if (Areg[3] == 1)
                     Areg[3:0] = Areg[3:0] - 4'b0011;
-                else if (Areg[7] == 1)
-                    Areg[7:4] = Areg[7:4] - 4'b0011;
-                else if (Areg[11] == 1)
-                    Areg[11:8] = Areg[11:8] - 4'b0011;
                 #5
                 state = 2'b01;
             end
