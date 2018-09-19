@@ -19,13 +19,15 @@ initial begin // Initialize input
     A = 8;
     B = 4;
     Cin = 1;
-    ctrl = 1;
+    ctrl = 0;
 end
 
 // Increment 8 times through all ctrl values
 always @(posedge clk) begin
     repeat (8)
         #10 ctrl = ctrl + 1; // Delay so output is visible in timing diagram
+    A = 8;
+    B = 7;
 end
 
 endmodule

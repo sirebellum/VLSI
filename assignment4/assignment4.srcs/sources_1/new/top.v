@@ -1,5 +1,4 @@
 `timescale 1ns / 1ps
-
 module sub1_Bit(A, B, Bin, Diff, Bout);
     input A, B, Bin;
     output Diff, Bout;
@@ -105,12 +104,16 @@ module alu4_Bit(A, B, Cin, ctrl, out, Cout);
     
     reg [3:0] aluOut; // Variable output for alu unit
     assign out = aluOut;
+    reg aluCout; // Variable output for Cout
+    assign Cout = aluCout;
     
     // Outputs for each module
     wire [3:0] ADD, SUB, OR, AND, SHL, SHR, ROL, ROR;
+    // Outputs for sub and add
+    wire ADDCout, SUBBout;
     // Various modules
-    add4_Bit ADD0(A, B, Cin, ADD, Cout);
-    sub4_Bit SUB0(A, B, Cin, SUB, Cout);
+    add4_Bit ADD0(A, B, Cin, ADD, ADDCout);
+    sub4_Bit SUB0(A, B, Cin, SUB, SUBBout);
     or4_Bit  OR0(A, B, OR);
     and4_Bit AND0(A, B, AND);
     shl4_Bit SHL0(A, SHL);
@@ -121,16 +124,21 @@ module alu4_Bit(A, B, Cin, ctrl, out, Cout);
     always @(A, B, Cin, ctrl) begin
         // Take ctrl line and set output to correct function
         case(ctrl)
-            3'b000: aluOut = ADD;
-            3'b001: aluOut = SUB;
-            3'b010: aluOut = OR;
-            3'b011: aluOut = AND;
-            3'b100: aluOut = SHL;
-            3'b101: aluOut = SHR;
-            3'b110: aluOut = ROL;
-            3'b111: aluOut = ROR;
-            default: aluOut = 0;
+            3'b000: begin
+                #1 aluOut = ADD;
+                aluCout = ADDCout;
+                end
+            3'b001: begin
+                #1 aluOut = SUB;
+                aluCout = SUBBout;
+                end
+            3'b010: #1 aluOut = OR;
+            3'b011: #1 aluOut = AND;
+            3'b100: #1 aluOut = SHL;
+            3'b101: #1 aluOut = SHR;
+            3'b110: #1 aluOut = ROL;
+            3'b111: #1 aluOut = ROR;
+            default: #1 aluOut = 0;
         endcase
     end
-    
 endmodule
