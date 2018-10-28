@@ -17,16 +17,12 @@ module FPAdder(F1, F2, out);
     reg signout;
     reg [7:0] expout;
     reg [22:0] valout;
-    reg [23:0] val; //placeholder for possibly larger value
+    reg [24:0] val; //placeholder for possibly larger value
     assign out[31] = signout;
     assign out[30:23] = expout + 127;
     assign out[22:0] = valout;
     
-    reg [4:0] bits1, bits2; //number of bits in each mantissa
-    
-    reg [5:0] index; //index for selecting val digit
     reg [5:0] shift; //number of shifts based on exp
-    reg [5:0] size; 
     
     always @(F1, F2) begin
         
@@ -35,65 +31,29 @@ module FPAdder(F1, F2, out);
         val1 = {1'b1, F1[22:0]}; //append leading 1
         val2 = {1'b1, F2[22:0]};
         
-        //Remove trailing zeroes
-        bits1 = 24;
-        bits2 = 24;
-        while (val1[0] != 1) begin
-            val1 = val1 >> 1;
-            bits1 = bits1 - 1; //count number of bits
-        end
-        while (val2[0] != 1) begin
-            val2 = val2 >> 1;
-            bits2 = bits2 - 1;
-        end
-        
-        //Match up decimal place
-        if (bits1 > bits2) begin
-            shift = bits1 - bits2;
-            val2 = val2 << shift;
-            size = bits1;
-        end
-        else if (bits2 > bits1) begin
-            shift = bits2 - bits1;
-            val1 = val1 << shift;
-            size = bits2;
-        end
-        
         //Shift for exponents
         if (exp1 > exp2) begin
             shift = exp1 - exp2;
-            val1 = val1 << shift;
-            size = size + shift;
+            val2 = val2 >> shift;
             expout = exp1;
         end
         else if (exp2 > exp1) begin
             shift = exp2 - exp1;
-            val2 = val2 << shift;
-            size = size + shift;
+            val1 = val1 >> shift;
             expout = exp2;
         end
         
         //Addition
         val = val1 + val2;
         
-        //Find first non zero value in added value
-        index = 22;
-        while (val[index] == 0 && index != 0) begin
-          index = index - 1;
-        end
-        
         //Adjust exponent out if val is large enough
-        if (index >= size)
+        if (val[24] == 1) begin
             expout = expout + 1;
+            val = val >> 1;
+        end
             
         //Populate valout
-        shift = 22;
-        while (shift >= 1) begin
-            val = val << 1; //Remove leading 1, as well as shift
-            valout[0] = val[index];
-            valout = valout << 1;
-            shift = shift - 1;
-        end
+        valout[22:0] = val[22:0];
     
     end
         
