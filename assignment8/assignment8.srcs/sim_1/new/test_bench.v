@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-// FPAdder
+/* FPAdder
 module test_bench();
 
 reg [31:0] f1, f2;
@@ -20,8 +20,8 @@ reg [31:0] f1, f2;
     end
     
 endmodule
-
-/* 64x64 multiplier
+*/
+// 64x64 multiplier
 module test_bench();
 
     // Inputs and outputs
@@ -51,8 +51,8 @@ module test_bench();
         // Flatten 64x64 arrays
         for (i=0; i<64; i=i+1) begin
             for (j=0; j<64; j=j+1) begin
-                A[i*64+j] = a[i][63-j];
-                B[i*64+j] = b[i][63-j];
+                A[i*64+j] = a[i][j];
+                B[i*64+j] = b[i][j];
             end
         end
         
@@ -60,11 +60,10 @@ module test_bench();
         // Expand OUTput arra
         for (i=0; i<64; i=i+1) begin
             for (j=0; j<64; j=j+1) begin
-                out[i][63-j] = OUT[i*64+j];
+                out[i][j] = OUT[i*64+j];
             end
         end
             
     end
     
 endmodule
-*/
